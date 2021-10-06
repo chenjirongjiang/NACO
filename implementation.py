@@ -49,12 +49,14 @@ class GeneticAlgorithm(Algorithm):
         self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
         self.evolution()
 
-    def generate_population(self, n):
+    #generate a random population size n
+    def generate_population(self, size_n):
         population = []
-        for i in range(n):
+        for i in range(size_n):
             population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
         return population
 
+    #flips a bit in a bitstring with chance pm
     def swap_mutation(self, candidate, pm):
         for i in range(len(candidate)):
             if random.random() < pm:
@@ -79,6 +81,7 @@ class GeneticAlgorithm(Algorithm):
 
         return new_population
 
+    #implementing all functions to find best candidate
     def evolution(self) -> None:
         n = 100 #initial population size
         pm = 1/ n #mutation probability
@@ -92,10 +95,10 @@ class GeneticAlgorithm(Algorithm):
                 population.append(i)
 
         
-        """for candidate in population:
+        for candidate in population:
             if self.fitness(candidate) > self.y_best:
                 self.y_best = self.fitness(candidate)
-                self.x_best = candidate"""
+                self.x_best = candidate
 
     
             
