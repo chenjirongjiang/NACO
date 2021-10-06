@@ -20,6 +20,8 @@ Only use keyword arguments for your __init__ method. This is a requirement for t
 test script to properly evaluate your algoritm.
 '''
 
+from hashlib import new
+from math import sqrt
 import ioh
 import random
 from algorithm import Algorithm
@@ -28,7 +30,7 @@ class RandomSearch(Algorithm):
     '''An example of Random Search.'''
 
     def __call__(self, problem: ioh.problem.Integer) -> None:
-        self.y_best: float = float("inf")
+        self.y_best: float = float("-inf")
         for iteration in range(self.max_iterations):
             # Generate a random bit string
             x: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
@@ -40,9 +42,42 @@ class RandomSearch(Algorithm):
             
 class GeneticAlgorithm(Algorithm):
     '''A skeleton (minimal) implementation of your Genetic Algorithm.'''
-    
+
     def __call__(self, problem: ioh.problem.Integer) -> None:
-        pass
+        self.problem = problem
+        self.y_best: float = float("-inf")
+        self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
+        population: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
+        main()
+
+        
+    def fitness(self, candidate):
+        return self.problem(candidate)
+    
+    def roulette_selection(self, population):
+        new_population = []
+        total_fitness = 0
+        for candidate in population:
+            total_fitness += self.fitness(candidate)
+
+        for candidate in population:
+            pi = self.fitness(candidate)/ total_fitness
+            if random.random() < pi:
+                new_population.append(candidate)
+
+        return new_population
+        
+    def main(self):
+        for iteration in range(self.max_iterations):
+            #for candidate in population:
+                
+            population= self.roulette_selection(population)
+        
+        for candidate in population:
+            if self.fitness(candidate) > self.y_best:
+                self.y_best = self.fitness(candidate)
+                self.x_best = candidate
+
     
             
 def main():
@@ -56,7 +91,7 @@ def main():
     problem: ioh.problem.Integer = ioh.get_problem(1, 1, 5, "Integer")
 
     # Run the algoritm on the problem
-    algorithm(problem)
+    GeneticAlgorithm(problem)
 
     # Inspect the results
     print("Best solution found:")
