@@ -47,7 +47,6 @@ class GeneticAlgorithm(Algorithm):
         self.problem = problem
         self.y_best: float = float("-inf")
         self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
-        population: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
         main()
 
         
@@ -66,8 +65,9 @@ class GeneticAlgorithm(Algorithm):
                 new_population.append(candidate)
 
         return new_population
-        
+
     def main(self):
+        population: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
         for iteration in range(self.max_iterations):
             #for candidate in population:
                 
