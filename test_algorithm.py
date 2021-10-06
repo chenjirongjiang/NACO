@@ -1,9 +1,8 @@
 import argparse
-from implementation import GeneticAlgorithm
 import ioh
 
 TYPE_NAME = "GeneticAlgorithm"
-MAX_EVALS = 50_00000
+MAX_EVALS = 50_000
 DIMENSION = 100 
 
 def test_algoritm(filename: str):
@@ -12,7 +11,7 @@ def test_algoritm(filename: str):
     algorithm = getattr(module, TYPE_NAME)()   
 
     test_problem = ioh.get_problem(1, 2, DIMENSION, 'Integer')
-    GeneticAlgorithm(test_problem)
+    algorithm(test_problem)
     assert test_problem.state.optimum_found and test_problem.state.evaluations <= MAX_EVALS, (
         f"Your algorithm did not find the optimum after {MAX_EVALS} iterations."
     )      

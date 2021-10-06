@@ -47,13 +47,26 @@ class GeneticAlgorithm(Algorithm):
         self.problem = problem
         self.y_best: float = float("-inf")
         self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
-        main()
+        self.evolution()
 
-        
-    def fitness(self, candidate):
+    def generate_population(self, n):
+        population = []
+        for i in range(n):
+            population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
+        return population
+
+    def swap_mutation(self, candidate, pm):
+        for i in range(len(candidate)):
+            if random.random() < pm:
+                candidate[i] = 1- candidate[i]
+
+    #takes a candidate and returns its evaluation
+    def fitness(self, candidate) -> float:
         return self.problem(candidate)
     
-    def roulette_selection(self, population):
+    #take a population and selects candidates based on chance 
+    #depending on their fitness divided by the total fitness
+    def roulette_selection(self, population) -> list:
         new_population = []
         total_fitness = 0
         for candidate in population:
@@ -66,17 +79,23 @@ class GeneticAlgorithm(Algorithm):
 
         return new_population
 
-    def main(self):
-        population: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
-        for iteration in range(self.max_iterations):
-            #for candidate in population:
-                
-            population= self.roulette_selection(population)
+    def evolution(self) -> None:
+        n = 100 #initial population size
+        pm = 1/ n #mutation probability
         
-        for candidate in population:
+        population = self.generate_population(n)
+        for iteration in range(self.max_iterations):
+            for candidate in population:
+                self.swap_mutation(candidate, pm )
+            population= self.roulette_selection(population)
+            for i in self.generate_population(n-len(population)):
+                population.append(i)
+
+        
+        """for candidate in population:
             if self.fitness(candidate) > self.y_best:
                 self.y_best = self.fitness(candidate)
-                self.x_best = candidate
+                self.x_best = candidate"""
 
     
             
@@ -85,13 +104,13 @@ def main():
     random.seed(42)
 
     # Instantiate the algoritm, you should replace this with your GA implementation 
-    algorithm = RandomSearch()
+    algorithm = GeneticAlgorithm()
 
     # Get a problem from the IOHexperimenter environment
     problem: ioh.problem.Integer = ioh.get_problem(1, 1, 5, "Integer")
 
     # Run the algoritm on the problem
-    GeneticAlgorithm(problem)
+    algorithm(problem)
 
     # Inspect the results
     print("Best solution found:")
