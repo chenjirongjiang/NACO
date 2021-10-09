@@ -56,16 +56,16 @@ class GeneticAlgorithm(Algorithm):
             if random.random() < pm:
                 candidate[i] = 1- candidate[i]
         return candidate
-    
+
     def cross_over(self, candidate1, candidate2, pc):
         p1, p2 = candidate1, candidate2
         k = random.randrange(len(candidate1)-1)
-        if random.random() < pc:
+        if random.random() <= pc:
             for i in range(k):
                 pt = random.randrange(len(candidate1)-1)
                 p1 = candidate1[:pt] + candidate2[pt:]
-                p2 = candidate2[:pt] +candidate1[pt:]
-        return p1, p2
+                p2 = candidate2[:pt] + candidate1[pt:]
+        return [p1, p2]
 
     #takes a candidate and returns its evaluation
     def fitness(self, candidate) -> float:
@@ -91,14 +91,12 @@ class GeneticAlgorithm(Algorithm):
         for candidate in population:
             total_fitness += self.fitness(candidate)
 
-        while len(population)<100:
-            for candidate in population:
-                pi = self.fitness(candidate)/ total_fitness
-                if random.random() < pi:
-                    new_population.append(candidate)
+        for candidate in population:
+            pi = self.fitness(candidate)/ total_fitness
+            if random.random() <= pi:
+                new_population.append(candidate)
         return new_population
 
-    
 
     #implementing all functions to find best candidate
     def evolution(self) -> None:        
@@ -108,10 +106,10 @@ class GeneticAlgorithm(Algorithm):
 
         #generate a random population size n
         population = []
-        for i in range(n):
-            population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
         
         for iteration in range(self.max_iterations):
+            for i in range(n - len(population)):
+                population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
             #check for best solution
             for candidate in population:
                 if self.fitness(candidate) > self.y_best:
