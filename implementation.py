@@ -20,6 +20,7 @@ Only use keyword arguments for your __init__ method. This is a requirement for t
 test script to properly evaluate your algoritm.
 '''
 
+<<<<<<< HEAD
 from hashlib import new
 from math import sqrt
 import ioh
@@ -42,7 +43,6 @@ class RandomSearch(Algorithm):
             
 class GeneticAlgorithm(Algorithm):
     '''A skeleton (minimal) implementation of your Genetic Algorithm.'''
-
     def __call__(self, problem: ioh.problem.Integer) -> None:
         self.problem = problem
         self.y_best: float = float("-inf")
@@ -129,7 +129,6 @@ class GeneticAlgorithm(Algorithm):
                     next_gen.append(self.swap_mutation(c, pm))
             population = next_gen
         
- 
             
 def main():
     # Set a random seed in order to get reproducible results
