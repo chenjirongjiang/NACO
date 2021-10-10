@@ -20,7 +20,6 @@ Only use keyword arguments for your __init__ method. This is a requirement for t
 test script to properly evaluate your algoritm.
 '''
 
-<<<<<<< HEAD
 from hashlib import new
 from math import sqrt
 import ioh
@@ -31,10 +30,11 @@ class RandomSearch(Algorithm):
     '''An example of Random Search.'''
 
     def __call__(self, problem: ioh.problem.Integer) -> None:
-        self.y_best: float = float("-inf")
+        self.y_best: float = float("inf")
         for iteration in range(self.max_iterations):
             # Generate a random bit string
             x: list[int] = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
+            print(x)
             # Call the problem in order to get the y value    
             y: float = problem(x)
             # update the current state
@@ -45,7 +45,7 @@ class GeneticAlgorithm(Algorithm):
     '''A skeleton (minimal) implementation of your Genetic Algorithm.'''
     def __call__(self, problem: ioh.problem.Integer) -> None:
         self.problem = problem
-        self.y_best: float = float("-inf")
+        self.y_best: float = float("inf")
         self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
         self.evolution()
 
@@ -73,9 +73,9 @@ class GeneticAlgorithm(Algorithm):
     
     def tournement_selection(self, population, subset_size):
         winners = []
-        champion = population[random.randrange(len(population))]
-        for i in population:
-            for j in range(subset_size):
+        for candidate in population:
+            champion = population[random.randrange(len(population))]
+            for j in range(subset_size -1):
                 challenger = population[random.randrange(len(population))]
                 if self.fitness(challenger) > self.fitness(champion):
                     champion = challenger
@@ -117,7 +117,7 @@ class GeneticAlgorithm(Algorithm):
                     self.x_best = candidate
 
             #select parents
-            selected = self.roulette_selection(population)
+            selected = self.tournement_selection(population,2)
             next_gen = []
             
             if len(selected) % 2:
@@ -135,7 +135,7 @@ def main():
     random.seed(42)
 
     # Instantiate the algoritm, you should replace this with your GA implementation 
-    algorithm = RandomSearch()
+    algorithm = GeneticAlgorithm()
 
     # Get a problem from the IOHexperimenter environment
     problem: ioh.problem.Integer = ioh.get_problem(1, 1, 5, "Integer")
