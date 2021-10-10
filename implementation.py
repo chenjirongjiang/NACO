@@ -117,8 +117,12 @@ class GeneticAlgorithm(Algorithm):
                     self.x_best = candidate
 
             #select parents
-            selected = self.tournement_selection(population, 2)
+            selected = self.roulette_selection(population)
             next_gen = []
+            
+            if len(selected) % 2:
+                next_gen.append(selected.pop())
+            
             for i in range(0, len(selected), 2):
                 c1, c2 = selected[i], selected[i+1]
                 for c in self.cross_over(c1, c2, pc):
@@ -132,7 +136,7 @@ def main():
     random.seed(42)
 
     # Instantiate the algoritm, you should replace this with your GA implementation 
-    algorithm = GeneticAlgorithm()
+    algorithm = RandomSearch()
 
     # Get a problem from the IOHexperimenter environment
     problem: ioh.problem.Integer = ioh.get_problem(1, 1, 5, "Integer")
