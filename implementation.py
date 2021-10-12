@@ -50,27 +50,48 @@ class GeneticAlgorithm(Algorithm):
         self.evolution()
 
 
-    #flips a bit in a bitstring with chance pm
-    def swap_mutation(self, candidate, pm):
+    #every bit has pm chance to be flipped
+    def bit_mutation(self, candidate, pm):
         for i in range(len(candidate)):
             if random.random() < pm:
                 candidate[i] = 1- candidate[i]
         return candidate
 
-    def cross_over(self, candidate1, candidate2, pc):
+    #pm chance for every bit to be flipped
+    def flipbit_mutation(self, candidate, pm):
+        if random.random() < pm:
+            for i in range(len(candidate)):
+                candidate[i] = 1 - candidate[i]
+        return candidate
+                
+    #random point k is chosen and crossover is done over that point
+    def one_point_crossover(self, candidate1, candidate2, pc):
         p1, p2 = candidate1, candidate2
-        k = random.randrange(len(candidate1)-1)
+        k = 1
         if random.random() <= pc:
             for i in range(k):
-                pt = random.randrange(len(candidate1)-1)
-                p1 = candidate1[:pt] + candidate2[pt:]
-                p2 = candidate2[:pt] + candidate1[pt:]
-        return [p1, p2]
+                pt = random.randrange(1, len(candidate1)-1)
+                child1 = p1[:pt] + p2[pt:]
+                child2 = p2[:pt] + p1[pt:]
+        return [child1, child2]
+
+    #every bit is chosen from either parent with equal chance
+    def uniform_crossover(self, candidate1, candidate2, pc):
+        child1, child2 = candidate1, candidate2
+        if random.random() <= pc:
+            for i in range(len(candidate1)):
+                if random.random() <= 0.5:
+                    child1[i] = candidate1[i]
+                    child2[i] = candidate2[i]
+                else:
+                    child1[i] = candidate2[i]
+                    child2[i] = candidate1[i]
 
     #takes a candidate and returns its evaluation
     def fitness(self, candidate) -> float:
         return self.problem(candidate)
     
+    #selects the best candidates from a small subset of the population to fill a new population
     def tournement_selection(self, population, subset_size):
         winners = []
         for candidate in population:
@@ -79,7 +100,7 @@ class GeneticAlgorithm(Algorithm):
                 challenger = population[random.randrange(len(population))]
                 if self.fitness(challenger) > self.fitness(champion):
                     champion = challenger
-                winners.append(champion)
+            winners.append(champion)
         return winners
 
 
@@ -101,10 +122,9 @@ class GeneticAlgorithm(Algorithm):
     #implementing all functions to find best candidate
     def evolution(self) -> None:        
         n = 100 #initial population size
-        pm = 1/ n #mutation probability
+        pm = 1/ 2 #mutation probability
         pc = 1 #crossover probability
 
-        #generate a random population size n
         population = []
         
         for iteration in range(self.max_iterations):
@@ -117,7 +137,7 @@ class GeneticAlgorithm(Algorithm):
                     self.x_best = candidate
 
             #select parents
-            selected = self.tournement_selection(population,2)
+            selected = self.tournement_selection(population,50)
             next_gen = []
             
             if len(selected) % 2:
@@ -125,8 +145,8 @@ class GeneticAlgorithm(Algorithm):
             
             for i in range(0, len(selected), 2):
                 c1, c2 = selected[i], selected[i+1]
-                for c in self.cross_over(c1, c2, pc):
-                    next_gen.append(self.swap_mutation(c, pm))
+                for c in self.one_point_crossover(c1, c2, pc):
+                    next_gen.append(self.bit_mutation(c, pm))
             population = next_gen
         
             
