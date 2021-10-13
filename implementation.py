@@ -45,9 +45,33 @@ class GeneticAlgorithm(Algorithm):
     '''A skeleton (minimal) implementation of your Genetic Algorithm.'''
     def __call__(self, problem: ioh.problem.Integer) -> None:
         self.problem = problem
-        self.y_best: float = float("inf")
-        self.x_best: int = [random.randint(0, 1) for _ in range(problem.meta_data.n_variables)]
-        self.evolution()
+        n = 100 #initial population size
+        pm = 0.01 #mutation probability
+        pc = 0.6 #crossover probability
+
+        population = []
+        for i in range(n):
+            population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
+            
+        for iteration in range(self.max_iterations):
+            #check for best solution
+            for candidate in population:
+                print(candidate)
+                print( problem(candidate))
+
+            #select parents
+            selected = self.tournement_selection(population, 2)
+
+            if len(selected) %2:
+                selected.pop()
+            next_gen = []
+            
+            for i in range(0, len(selected), 2):
+                c1, c2 = selected[i], selected[i+1]
+                children = self.uniform_crossover(c1, c2, pc)
+                for child in children:
+                    next_gen.append(self.flipbit_mutation(child, pm))
+            population = next_gen
 
 
     #every bit has pm chance to be flipped
@@ -65,12 +89,13 @@ class GeneticAlgorithm(Algorithm):
         return candidate
                 
     #random point k is chosen and crossover is done over that point
-    def one_point_crossover(self, candidate1, candidate2, pc):
+    def two_point_crossover(self, candidate1, candidate2, pc):
         p1, p2 = candidate1, candidate2
-        k = 1
+        child1, child2 = candidate1, candidate2
+        k = 2
         if random.random() <= pc:
             for i in range(k):
-                pt = random.randrange(1, len(candidate1)-1)
+                pt = random.randrange(1, len(candidate1)-2)
                 child1 = p1[:pt] + p2[pt:]
                 child2 = p2[:pt] + p1[pt:]
         return [child1, child2]
@@ -86,23 +111,19 @@ class GeneticAlgorithm(Algorithm):
                 else:
                     child1[i] = candidate2[i]
                     child2[i] = candidate1[i]
-
-    #takes a candidate and returns its evaluation
-    def fitness(self, candidate) -> float:
-        return self.problem(candidate)
+        return [child1, child2]
     
     #selects the best candidates from a small subset of the population to fill a new population
     def tournement_selection(self, population, subset_size):
         winners = []
-        for candidate in population:
+        for i in range(len(population)):
             champion = population[random.randrange(len(population))]
             for j in range(subset_size -1):
                 challenger = population[random.randrange(len(population))]
-                if self.fitness(challenger) > self.fitness(champion):
+                if self.problem(challenger) > self.problem(champion):
                     champion = challenger
             winners.append(champion)
         return winners
-
 
     #take a population and selects candidates based on chance 
     #depending on their fitness divided by the total fitness
@@ -110,44 +131,14 @@ class GeneticAlgorithm(Algorithm):
         new_population = []
         total_fitness = 0
         for candidate in population:
-            total_fitness += self.fitness(candidate)
-
-        for candidate in population:
-            pi = self.fitness(candidate)/ total_fitness
-            if random.random() <= pi:
-                new_population.append(candidate)
-        return new_population
-
-
-    #implementing all functions to find best candidate
-    def evolution(self) -> None:        
-        n = 100 #initial population size
-        pm = 1/ 2 #mutation probability
-        pc = 1 #crossover probability
-
-        population = []
+            total_fitness += self.problem(candidate)
         
-        for iteration in range(self.max_iterations):
-            for i in range(n - len(population)):
-                population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
-            #check for best solution
+        while len(new_population) < len(population):
             for candidate in population:
-                if self.fitness(candidate) > self.y_best:
-                    self.y_best = self.fitness(candidate)
-                    self.x_best = candidate
-
-            #select parents
-            selected = self.tournement_selection(population,50)
-            next_gen = []
-            
-            if len(selected) % 2:
-                next_gen.append(selected.pop())
-            
-            for i in range(0, len(selected), 2):
-                c1, c2 = selected[i], selected[i+1]
-                for c in self.one_point_crossover(c1, c2, pc):
-                    next_gen.append(self.bit_mutation(c, pm))
-            population = next_gen
+                pi = self.problem(candidate)/ total_fitness
+                if random.random() <= pi*5:
+                    new_population.append(candidate)
+        return new_population
         
             
 def main():
