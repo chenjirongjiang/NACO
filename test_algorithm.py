@@ -10,7 +10,7 @@ def test_algoritm(filename: str):
     module = __import__(module_name, fromlist=[TYPE_NAME]) 
     algorithm = getattr(module, TYPE_NAME)()   
 
-    test_problem = ioh.get_problem(1, 2, DIMENSION, 'Integer')
+    test_problem = ioh.get_problem(2, 1, DIMENSION, 'Integer')
     algorithm(test_problem)
     assert test_problem.state.optimum_found and test_problem.state.evaluations <= MAX_EVALS, (
         f"Your algorithm did not find the optimum after {MAX_EVALS} iterations."
