@@ -7,13 +7,60 @@ from implementation import RandomSearch
 class CellularAutomata:
     '''Skeleton CA, you should implement this.'''
     
-    def __init__(self, rule_number: int):
-        pass
-
-    def __call__(self, c0: typing.List[int], t: int) -> typing.List[int]:
+    def __init__(self,k, rule_number: int, t: int, c0: typing.List[int]):
+        self.k = k
+        self.rule_number = rule_number
+        self.t = t
+        self.c0 = c0
+        self.radius = 1
+        
+        
+    
+    def __call__(self):
         '''Evaluate for T timesteps. Return Ct for a given C0.'''
-        pass
+        state = self.c0
 
+        for i in range(self.t):
+            state = self.transition(state, self.k )
+        
+        return state
+
+
+    def neighbours(self, c0, cell_position):
+        neighbourhood = []
+        for r in range(self.radius+1):
+            if cell_position + r >= len(c0):
+                neighbourhood.insert(0, c0[cell_position - r])
+                neighbourhood.append(0)
+            elif cell_position - r < 0:
+                neighbourhood.insert(0, 0)
+                neighbourhood.append(c0[cell_position + r])
+            elif r == 0:
+                neighbourhood.append(c0[cell_position])
+            else:
+                neighbourhood.insert(0, c0[cell_position - r])
+                neighbourhood.append(c0[cell_position + r])
+        return neighbourhood
+
+    def rule_list(self):
+        binary_list = []
+        binary_rule = format(self.rule_number, "b")
+        for i in binary_rule:
+            binary_list.append(i)
+        while len(binary_list) < 8:
+            binary_list.insert(0, 0)
+        return binary_list
+
+    def transition(self, c0, k):
+        states = [[1,1,1], [1,1,0], [1,0,1], [1,0,0], [0,1,1], [0,1,0], [0,0,1], [0,0,0]]
+        rule_states = self.rule_list()
+        new_state = []
+        if k == 2:
+            for i in range(len(c0)):
+                neighbourhood = self.neighbours(c0, i, self.radius)
+                index_state = states.index(neighbourhood)
+                new_state.append(rule_states[index_state])
+        return new_state
 
 def objective_function(c0_prime: typing.List[int]) -> float:
     '''Skeleton objective function. You should implement a method
