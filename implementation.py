@@ -46,8 +46,8 @@ class GeneticAlgorithm(Algorithm):
     def __call__(self, problem: ioh.problem.Integer) -> None:
         self.problem = problem
         m = 100 #initial population size
-        pm = 0.001 #mutation probability
-        pc = 0.6 #crossover probability
+        pm = 0.008 #mutation probability
+        pc = 0.7 #crossover probability
         s = 2 #subset for tournement selection
 
         population = []
@@ -57,7 +57,6 @@ class GeneticAlgorithm(Algorithm):
         for iteration in range(self.max_iterations):
             #check for best solution
             for candidate in population:
-                print(candidate)
                 print( problem(candidate))
 
             #select parents
@@ -118,9 +117,11 @@ class GeneticAlgorithm(Algorithm):
     def tournement_selection(self, population, subset_size):
         winners = []
         for i in range(len(population)):
-            champion = population[random.randrange(len(population))]
+            p = random.randrange(len(population))
+            champion = population[p]
             for j in range(subset_size -1):
-                challenger = population[random.randrange(len(population))]
+                q = random.randrange(len(population))
+                challenger = population[q]
                 if self.problem(challenger) > self.problem(champion):
                     champion = challenger
             winners.append(champion)
