@@ -45,14 +45,13 @@ class GeneticAlgorithm(Algorithm):
     '''A skeleton (minimal) implementation of your Genetic Algorithm.'''
     def __call__(self, problem: ioh.problem.Integer) -> None:
         self.problem = problem
-        m = 100 #initial population size
+        pop = 100 #initial population size
         pm = 0.008 #mutation probability
         pc = 0.7 #crossover probability
         s = 2 #subset for tournement selection
+        k = 2 #binary/ discrete domain
 
-        population = []
-        for i in range(m):
-            population.append([random.randint(0, 1) for _ in range(self.problem.meta_data.n_variables)])
+        population = self.initiation(k, pop)
             
         for iteration in range(self.max_iterations):
             #check for best solution
@@ -73,6 +72,12 @@ class GeneticAlgorithm(Algorithm):
                     next_gen.append(self.bit_mutation(child, pm))
             population = next_gen
 
+    #prduces initial population
+    def initiation(self, k, pop):
+        population =[]
+        for i in range(pop):
+            population.append([random.randint(0, k) for _ in range(self.problem.meta_data.n_variables)])
+        return population
 
     #every bit has pm chance to be flipped
     def bit_mutation(self, candidate, pm):
