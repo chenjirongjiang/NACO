@@ -98,6 +98,8 @@ class GeneticAlgorithm(Algorithm):
                 pt = random.randrange(1, len(candidate1)-2)
                 child1 = p1[:pt] + p2[pt:]
                 child2 = p2[:pt] + p1[pt:]
+                p1 = child1
+                p2 = child2
         return [child1, child2]
 
     #every bit is chosen from either parent with equal chance
