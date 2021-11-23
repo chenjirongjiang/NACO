@@ -87,7 +87,7 @@ class GeneticAlgorithm(Algorithm):
                 option = [0,1,2]
                 option.remove(candidate[i])
                 child[i] = random.choice(option)
-        return candidate
+        return child
 
     #pm chance for every int to be changed in one of the other integers
     def flipint_mutation(self, candidate, pm):
@@ -97,6 +97,7 @@ class GeneticAlgorithm(Algorithm):
                 option = [0,1,2]
                 option.remove(candidate[i])
                 child[i] = random.choice(option)
+        return child
 
     #every bit has pm chance to be flipped
     def bit_mutation(self, candidate, pm):
@@ -104,7 +105,7 @@ class GeneticAlgorithm(Algorithm):
         for i in range(len(candidate)):
             if random.random() <= pm:
                 child[i] = 1- candidate[i]
-        return candidate
+        return child
 
     #pm chance for every bit to be flipped
     def flipbit_mutation(self, candidate, pm):
@@ -112,7 +113,7 @@ class GeneticAlgorithm(Algorithm):
         if random.random() < pm:
             for i in range(len(candidate)):
                 child[i] = 1 - candidate[i]
-        return candidate
+        return child
                 
     #random point k is chosen and crossover is done over that point
     def two_point_crossover(self, candidate1, candidate2, pc):
