@@ -79,18 +79,39 @@ class GeneticAlgorithm(Algorithm):
             population.append([random.randint(0, k) for _ in range(self.problem.meta_data.n_variables)])
         return population
 
+    #every int has pm chance to be changed in one of the other integers
+    def int_mutation(self, candidate, pm):
+        child = candidate
+        for i in range(len(candidate)):
+            if random.random() <- pm:
+                option = [0,1,2]
+                option.remove(candidate[i])
+                child[i] = random.choice(option)
+        return candidate
+
+    #pm chance for every int to be changed in one of the other integers
+    def flipint_mutation(self, candidate, pm):
+        child = candidate
+        if random.random() <= pm:
+            for i in range(len(candidate)):
+                option = [0,1,2]
+                option.remove(candidate[i])
+                child[i] = random.choice(option)
+
     #every bit has pm chance to be flipped
     def bit_mutation(self, candidate, pm):
+        child = candidate
         for i in range(len(candidate)):
-            if random.random() < pm:
-                candidate[i] = 1- candidate[i]
+            if random.random() <= pm:
+                child[i] = 1- candidate[i]
         return candidate
 
     #pm chance for every bit to be flipped
     def flipbit_mutation(self, candidate, pm):
+        child = candidate
         if random.random() < pm:
             for i in range(len(candidate)):
-                candidate[i] = 1 - candidate[i]
+                child[i] = 1 - candidate[i]
         return candidate
                 
     #random point k is chosen and crossover is done over that point
