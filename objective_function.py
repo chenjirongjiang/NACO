@@ -69,15 +69,16 @@ class CellularAutomata:
             new_state.append(rule_states[index_state])
         return new_state
 
-def objective_function(c0_prime: typing.List[int]) -> float:
+def objective_function_1(c0_prime: typing.List[int]) -> float:
     '''Skeleton objective function. You should implement a method
     which computes a similarity measure between c0_prime a suggested by your
     GA, with the true c0 state for the ct state given in the sup. material. '''
     
-    ct, rule, t = None, None, None # Given by the sup. material 
+    k, ct, rule, t =None, None, None, None # Given by the sup. material 
+
 
     ca = CellularAutomata(rule)
-    ct_prime = ca(c0_prime, t)
+    ct_prime = ca(k, rule , t, c0_prime)
     similarity = 0.0 # You should implement this
 
     return similarity
@@ -91,7 +92,7 @@ def example():
 
     # Wrap objective_function as an ioh problem
     problem = ioh.problem.wrap_integer_problem(
-            objective_function,
+            objective_function_1,
             "objective_function_ca_1",
             60, 
             ioh.OptimizationType.Maximization,

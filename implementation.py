@@ -47,19 +47,29 @@ class GeneticAlgorithm(Algorithm):
         self.problem = problem
         pop = 100 #initial population size
         pm = 0.008 #mutation probability
-        pc = 0.7 #crossover probability
-        s = 2 #subset for tournement selection
+        pc = 0.8 #crossover probability
+        s = 10 #subset for tournement selection
         k = 2 #binary/ discrete domain
 
         population = self.initiation(k, pop)
-            
+        optimal = False
+
         for iteration in range(self.max_iterations):
             #check for best solution
+            scores = []
             for candidate in population:
-                print( problem(candidate))
+                score = problem(candidate)
+                scores.append(score)
+                if score == 100.0:
+                    print(f"Optimal solution has been found: {candidate}")
+                    optimal = True
+                    break
+            if optimal:
+                print(f"Amount of iterations: {iteration}")
+                break
 
             #select parents
-            selected = self.tournement_selection(population, s)
+            selected = self.tournement_selection(population, s, scores)
 
             if len(selected) %2:
                 selected.pop()
@@ -76,7 +86,7 @@ class GeneticAlgorithm(Algorithm):
     def initiation(self, k, pop):
         population =[]
         for i in range(pop):
-            population.append([random.randint(0, k) for _ in range(self.problem.meta_data.n_variables)])
+            population.append([random.randint(0, k-1) for _ in range(self.problem.meta_data.n_variables)])
         return population
 
     #every int has pm chance to be changed in one of the other integers
@@ -104,7 +114,7 @@ class GeneticAlgorithm(Algorithm):
         child = candidate
         for i in range(len(candidate)):
             if random.random() <= pm:
-                child[i] = 1- candidate[i]
+                candidate[i] = 1- candidate[i]
         return child
 
     #pm chance for every bit to be flipped
@@ -119,7 +129,7 @@ class GeneticAlgorithm(Algorithm):
     def two_point_crossover(self, candidate1, candidate2, pc):
         p1, p2 = candidate1, candidate2
         child1, child2 = candidate1, candidate2
-        k = 2
+        k = 1
         if random.random() <= pc:
             for i in range(k):
                 pt = random.randrange(1, len(candidate1)-2)
@@ -143,32 +153,32 @@ class GeneticAlgorithm(Algorithm):
         return [child1, child2]
     
     #selects the best candidates from a small subset of the population to fill a new population
-    def tournement_selection(self, population, subset_size):
+    def tournement_selection(self, population, subset_size, scores):
         winners = []
         for i in range(len(population)):
             p = random.randrange(len(population))
-            champion = population[p]
+            champion = p
             for j in range(subset_size -1):
                 q = random.randrange(len(population))
-                challenger = population[q]
-                if self.problem(challenger) > self.problem(champion):
+                challenger = q
+                if scores[challenger] > scores[champion]:
                     champion = challenger
-            winners.append(champion)
+            winners.append(population[champion])
         return winners
 
     #take a population and selects candidates based on chance 
     #depending on their fitness divided by the total fitness
-    def roulette_selection(self, population) -> list:
+    def roulette_selection(self, population, subset_size, scores) -> list:
         new_population = []
         total_fitness = 0
-        for candidate in population:
-            total_fitness += self.problem(candidate)
+        for score in scores:
+            total_fitness += score
         
         while len(new_population) < len(population):
-            for candidate in population:
-                pi = self.problem(candidate)/ total_fitness
-                if random.random() <= pi*5:
-                    new_population.append(candidate)
+            i = random.randrange(len(population))
+            pi = scores[i]/ total_fitness
+            if random.random() <= pi:
+                new_population.append(population[i])
         return new_population
         
             
