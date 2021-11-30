@@ -8,7 +8,7 @@ class Algorithm(abc.ABC):
     '''This class should be used as a base class (interface) for your implementation as Genetic Algorithm.     
     '''
     
-    def __init__(self, max_iterations:int = 300):
+    def __init__(self, max_iterations:int = 500):
         self.max_iterations: int = max_iterations
     
     def __init_subclass__(cls, *args, **kwargs): 

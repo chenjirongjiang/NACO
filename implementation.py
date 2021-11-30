@@ -47,7 +47,7 @@ class GeneticAlgorithm(Algorithm):
         self.problem = problem
         pop = 100 #initial population size
         pm = 0.008 #mutation probability
-        pc = 0.8 #crossover probability
+        pc = 0.7 #crossover probability
         s = 10 #subset for tournement selection
         k = 2 #binary/ discrete domain
 
@@ -56,12 +56,11 @@ class GeneticAlgorithm(Algorithm):
 
         for iteration in range(self.max_iterations):
             #check for best solution
-            scores = []
-            for candidate in population:
-                score = problem(candidate)
-                scores.append(score)
-                if score == 100.0:
-                    print(f"Optimal solution has been found: {candidate}")
+            scores = [problem(candidate) for candidate in population]
+            for i in range(len(population)):
+                print(scores[i])
+                if scores[i] == 100.0:
+                    print(f"Optimal solution has been found: {population[i]}")
                     optimal = True
                     break
             if optimal:
@@ -69,7 +68,7 @@ class GeneticAlgorithm(Algorithm):
                 break
 
             #select parents
-            selected = self.tournement_selection(population, s, scores)
+            selected = self.roulette_selection(population, s, scores)
 
             if len(selected) %2:
                 selected.pop()
@@ -84,9 +83,7 @@ class GeneticAlgorithm(Algorithm):
 
     #prduces initial population
     def initiation(self, k, pop):
-        population =[]
-        for i in range(pop):
-            population.append([random.randint(0, k-1) for _ in range(self.problem.meta_data.n_variables)])
+        population =[[random.randint(0, k-1) for _ in range(self.problem.meta_data.n_variables)] for _ in range(pop)]
         return population
 
     #every int has pm chance to be changed in one of the other integers
@@ -170,18 +167,30 @@ class GeneticAlgorithm(Algorithm):
     #depending on their fitness divided by the total fitness
     def roulette_selection(self, population, subset_size, scores) -> list:
         new_population = []
-        total_fitness = 0
-        for score in scores:
-            total_fitness += score
-        
+        square = 15
+        scores_squares = [pow(x,square) for x in scores]
         while len(new_population) < len(population):
             i = random.randrange(len(population))
-            pi = scores[i]/ total_fitness
+            pi = scores_squares[i]/ sum(scores_squares)
             if random.random() <= pi:
                 new_population.append(population[i])
         return new_population
         
-            
+    def rank_selection(self, population, subset_size, scores) -> list:
+        ranks = [[population[i], scores[i]] for i in range(len(population))]
+        ranks.sort(key=lambda x:x[1])
+        
+        amount = len(population)
+        total_score = (amount*(amount+1))/2
+        new_population = []
+
+        while len(new_population) < len(population):
+            i = random.randrange(len(population))
+            pi = ranks[i][1]/ total_score
+            if random.random() <= pi:
+                new_population.append(ranks[i][0])
+        return new_population
+
 def main():
     # Set a random seed in order to get reproducible results
     random.seed(42)
