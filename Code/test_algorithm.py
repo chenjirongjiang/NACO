@@ -11,7 +11,7 @@ def test_algoritm(filename: str):
     algorithm = getattr(module, TYPE_NAME)()   
 
     test_problem = ioh.get_problem(2, 1, DIMENSION, 'Integer')
-    algorithm(test_problem)
+    print(algorithm(test_problem))
     assert test_problem.state.optimum_found and test_problem.state.evaluations <= MAX_EVALS, (
         f"Your algorithm did not find the optimum after {MAX_EVALS} iterations."
     )      
